@@ -1,29 +1,58 @@
 const express = require('express');
 const app = express();
 const port = 8086;
+app.use(express.json());
 const bodyParser = require('body-parser');
 const Locatario = require('./entidades/locatario');
 const Livro = require('./entidades/livro');
+const Autor = require('./entidades/autores');
+const livroController = require('./controller/livroController');
+const autorController = require('./controller/autorController');
+const locatarioController = require('./controller/locatarioController');
+const email = require('./config/email');
+//const routes = require('./routes');
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get('/login', function(req, res){
-    // console.log('Funcionando!')
+app.get('/login', function (req, res) {
+    console.log('Funcionando!')
 
 })
 
-app.get('/cadastroLocatario', function(req, res) {
+app.get('/listarLivros', function (req, res) {
+    console.log('Funcionou')
+    let livros = livroController.listarLivros();
+    res.json(livros);
+    return;
+});
+
+app.get('/listarAutores', async function (req, res) {
+    console.log('Funciona')
+    let autores = await autorController.listarAutores();
+    res.json(autores);
+    return;
+});
+
+app.post('/cadastrarAutor', async function (req, res) {
+    const novo_autor = new Autor(null, req.body.nome);
+    await autorController.criarAutor(novo_autor);
+    res.status(201).json({ 'message': 'Autor criado com sucesso' });
+    return;
+});
+
+app.get('/cadastrarLocatario', function (req, res) {
     res.render('CadastroLocatario');
 })
 
-app.post('/cadastroLocatario', function (req, res) {
+app.post('/cadastrarLocatario', function (req, res) {
     const novo_locatario = new Locatario(req.body.id, req.body.nome, req.body.dataNascimento, req.body.email, req.body.senha, req.body.telefone, req.body.tipo);
 
     const resultado = locatarioController.criarLocatario(novo_locatario);
     resultado.then(resp => {
-        if(resp.length > 0) {
-            res.render('cadastroUsuario', { locatario: novo_locatario, mensagem: resp});
+        if (resp.length > 0) {
+            res.render('cadastroUsuario', { locatario: novo_locatario, mensagem: resp });
         } else {
             email(novo_locatario.email, 'Cadastro no sistema', 'Seu cadastro foi realizado com sucesso!');
             res.redirect('/login');
@@ -33,10 +62,10 @@ app.post('/cadastroLocatario', function (req, res) {
 
 app.post('/removerLocatario', function (req, res) {
     const resultado = locatarioController.removerLocatario(req.query.id);
-    resultado.then(resp => {res.redirect('/CadastroLocatario')});
+    resultado.then(resp => { res.redirect('/CadastroLocatario') });
 })
 
-app.get('/cadastroLivro', function(req, res) {
+app.get('/cadastroLivro', function (req, res) {
     res.render('CadastroLivro');
 })
 
@@ -45,13 +74,17 @@ app.post('/cadastroLivro', function (req, res) {
 
     const resultado = livroController.criarLivro(novo_livro);
     resultado.then(resp => {
-        if(resp.length > 0) {
-            res.render('CadastroLivro', {livro: novo_livro, mensagem: resp});
+        if (resp.length > 0) {
+            res.render('CadastroLivro', { livro: novo_livro, mensagem: resp });
         }
         res.redirect('/catalogo')
     })
 })
 
+app.post('/removerLivro', function (req, res) {
+
+})
+
 app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}...`);  
+    console.log(`Servidor rodando na porta ${port}...`);
 })
