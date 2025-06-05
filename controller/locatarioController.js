@@ -12,6 +12,11 @@ exports.criarLocatario = async function(novo_locatario) {
     return [];
 }
 
+exports.listarLocatarios = async function () {
+    const locatarios = await locatarioDAO.listarLocatarios();
+    return locatarios;
+}
+
 exports.removerLocatario = async function(id) {
     return await locatarioDAO.removerLocatario(id);
 }

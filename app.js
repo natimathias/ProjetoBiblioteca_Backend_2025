@@ -10,8 +10,6 @@ const livroController = require('./controller/livroController');
 const autorController = require('./controller/autorController');
 const locatarioController = require('./controller/locatarioController');
 const email = require('./config/email');
-//const routes = require('./routes');
-
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -21,16 +19,10 @@ app.get('/login', function (req, res) {
 
 })
 
-app.get('/listarLivros', function (req, res) {
-    console.log('Funcionou')
-    let livros = livroController.listarLivros();
-    res.json(livros);
-    return;
-});
-
+//Rotas Autores
 app.get('/listarAutores', async function (req, res) {
     console.log('Funciona')
-    let autores = await autorController.listarAutores();
+    const autores = await autorController.listarAutores();
     res.json(autores);
     return;
 });
@@ -42,13 +34,20 @@ app.post('/cadastrarAutor', async function (req, res) {
     return;
 });
 
+//Rotas Locatario
+app.get('/listarLocatarios', function(req, res) {
+    const locatarios = locatarioController.listarLocatarios();
+    res.json(locatarios);
+    return;
+})
+
 app.get('/cadastrarLocatario', function (req, res) {
     res.render('CadastroLocatario');
 })
 
 app.post('/cadastrarLocatario', function (req, res) {
     const novo_locatario = new Locatario(req.body.id, req.body.nome, req.body.dataNascimento, req.body.email, req.body.senha, req.body.telefone, req.body.tipo);
-
+    
     const resultado = locatarioController.criarLocatario(novo_locatario);
     resultado.then(resp => {
         if (resp.length > 0) {
@@ -64,6 +63,14 @@ app.post('/removerLocatario', function (req, res) {
     const resultado = locatarioController.removerLocatario(req.query.id);
     resultado.then(resp => { res.redirect('/CadastroLocatario') });
 })
+
+//Rotas Livros
+app.get('/listarLivros', function (req, res) {
+    console.log('Funcionou')
+    const livros = livroController.listarLivros();
+    res.json(livros);
+    return;
+});
 
 app.get('/cadastroLivro', function (req, res) {
     res.render('CadastroLivro');
@@ -81,9 +88,7 @@ app.post('/cadastroLivro', function (req, res) {
     })
 })
 
-app.post('/removerLivro', function (req, res) {
-
-})
+app.post('/removerLivro', function (req, res) {})
 
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}...`);

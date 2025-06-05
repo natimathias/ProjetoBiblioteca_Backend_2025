@@ -10,6 +10,11 @@ exports.criarLocatario = async function (novo_locatario) {
     return "Locatário cadastrado com sucesso!"
 }
 
+exports.listarLocatarios = async function () {
+    const locatario = await db.query('SELECT * FROM locatario');
+    return locatario.rows;
+}
+
 exports.removerLocatario = async function (id) {
     const { rows } = await db.query(`UPDATE locatario SET ativo = false WHERE id = '${id}'`);
 
