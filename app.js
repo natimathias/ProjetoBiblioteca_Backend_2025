@@ -3,13 +3,17 @@ const app = express();
 const port = 8086;
 app.use(express.json());
 const bodyParser = require('body-parser');
+const email = require('./config/email');
+
 const Locatario = require('./entidades/locatario');
 const Livro = require('./entidades/livro');
 const Autor = require('./entidades/autores');
+const Editora = require('./entidades/editora');
+
 const livroController = require('./controller/livroController');
 const autorController = require('./controller/autorController');
 const locatarioController = require('./controller/locatarioController');
-const email = require('./config/email');
+const editoraController = require('./controller/editoraController');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -19,7 +23,7 @@ app.get('/login', function (req, res) {
 
 })
 
-//Rotas Autores
+//Rotas Autor
 app.get('/listarAutores', async function (req, res) {
     console.log('Funciona')
     const autores = await autorController.listarAutores();
@@ -32,6 +36,18 @@ app.post('/cadastrarAutor', async function (req, res) {
     await autorController.criarAutor(novo_autor);
     res.status(201).json({ 'message': 'Autor criado com sucesso' });
     return;
+});
+
+//Rotas Editora
+app.get('/listarEditoras', async function (req, res) {
+    console.log('Funciona')
+    const editoras = await editoraController.listarEditoras();
+    res.json(editoras);
+    return;
+});
+
+app.post ('/cadastrarEditora', async function (req, res) {
+    const nova_editora = new Editora
 });
 
 //Rotas Locatario
@@ -64,31 +80,31 @@ app.post('/removerLocatario', function (req, res) {
     resultado.then(resp => { res.redirect('/CadastroLocatario') });
 })
 
-//Rotas Livros
-app.get('/listarLivros', function (req, res) {
-    console.log('Funcionou')
-    const livros = livroController.listarLivros();
-    res.json(livros);
-    return;
-});
+// //Rotas Livros
+// app.get('/listarLivros', function (req, res) {
+//     console.log('Funcionou')
+//     const livros = livroController.listarLivros();
+//     res.json(livros);
+//     return;
+// });
 
-app.get('/cadastroLivro', function (req, res) {
-    res.render('CadastroLivro');
-})
+// app.get('/cadastroLivro', function (req, res) {
+//     res.render('CadastroLivro');
+// })
 
-app.post('/cadastroLivro', function (req, res) {
-    const novo_livro = new Livro(req.body.id, req.body.nome, req.body.titulo, req.body.qt_disponivel, req.body.isbn, req.body.id_autores, req.body.edicao, req.body.id_editora, req.body.caminho_imagens);
+// app.post('/cadastroLivro', function (req, res) {
+//     const novo_livro = new Livro(req.body.id, req.body.nome, req.body.titulo, req.body.qt_disponivel, req.body.isbn, req.body.id_autores, req.body.edicao, req.body.id_editora, req.body.caminho_imagens);
 
-    const resultado = livroController.criarLivro(novo_livro);
-    resultado.then(resp => {
-        if (resp.length > 0) {
-            res.render('CadastroLivro', { livro: novo_livro, mensagem: resp });
-        }
-        res.redirect('/catalogo')
-    })
-})
+//     const resultado = livroController.criarLivro(novo_livro);
+//     resultado.then(resp => {
+//         if (resp.length > 0) {
+//             res.render('CadastroLivro', { livro: novo_livro, mensagem: resp });
+//         }
+//         res.redirect('/catalogo')
+//     })
+// })
 
-app.post('/removerLivro', function (req, res) {})
+// app.post('/removerLivro', function (req, res) {})
 
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}...`);

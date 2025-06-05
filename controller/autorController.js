@@ -1,6 +1,6 @@
 const autorDAO = require('../model/autor.dao');
 
-const criarAutor = async function (novo_autor) {
+exports.criarAutor = async function(novo_autor) {
     const erros = [];
 
     if (erros.length > 0) {
@@ -11,13 +11,12 @@ const criarAutor = async function (novo_autor) {
     return [];
 }
 
-const listarAutores = async function () {
-    let autors = await autorDAO.listarAutores();
-    return autors;
+exports.listarAutores = async function() {
+    let autores = await autorDAO.listarAutores();
+    return autores;
 }
 
-const removerAutor = async function (autor) {
+exports.removerAutor = async function(autor) {
     await autorDAO.removerAutor(autor.id);
 }
 
-module.exports = { criarAutor, listarAutores, removerAutor }
