@@ -47,7 +47,10 @@ app.get('/listarEditoras', async function (req, res) {
 });
 
 app.post ('/cadastrarEditora', async function (req, res) {
-    const nova_editora = new Editora
+    const nova_editora = new Editora(req.body.id, req.body.nome, req.body.endereco, req.body.telefone);
+    await editoraController.criarEditora(nova_editora);
+    res.status(201).json({ 'message': 'Editora criada com sucesso' });
+    return;
 });
 
 //Rotas Locatario

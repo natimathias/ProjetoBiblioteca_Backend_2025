@@ -11,6 +11,6 @@ exports.removerEditora = async function(id) {
 }
 
 exports.listarEditoras = async function() {
-    const editoras = await db.query(`SELECT nome FROM editora`); 
+    const editoras = await db.query(`SELECT * FROM editora`); 
     return editoras.rows;
 }

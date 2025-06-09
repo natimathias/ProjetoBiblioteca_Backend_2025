@@ -12,7 +12,7 @@ exports.criarEditora = async function(novo_editora) {
 }
 
 exports.listarEditoras = async function() {
-    let editora = await editoraDAO.listarEditora();
+    let editora = await editoraDAO.listarEditoras();
     return editora;
 }
 
