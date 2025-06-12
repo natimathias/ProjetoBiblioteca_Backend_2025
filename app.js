@@ -37,8 +37,13 @@ app.post('/cadastrarAutor', async function (req, res) {
     const novo_autor = new Autor(null, req.body.nome);
     await autorController.criarAutor(novo_autor);
     res.status(201).json({ 'message': 'Autor criado com sucesso' });
-    res.redirect('/listarAutores')
     return;
+});
+
+app.delete('/removerAutor', function (req, res) {
+    const resultado = autorController.removerAutor(req.params.id);
+    resultado.then(resp => { res.redirect('/CadastroAutor') });
+    console.log("Autor removido com sucesso!");
 });
 
 //Rotas Editora
@@ -84,7 +89,7 @@ app.post('/cadastrarLocatario', function (req, res) {
 app.post('/removerLocatario', function (req, res) {
     const resultado = locatarioController.removerLocatario(req.query.id);
     resultado.then(resp => { res.redirect('/CadastroLocatario') });
-})
+});
 
 // //Rotas Livros
 // app.get('/listarLivros', function (req, res) {

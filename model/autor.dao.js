@@ -9,8 +9,8 @@ exports.criarAutor = async function(novo_autor) {
 }
 
 exports.removerAutor = async function(id) {
-    const resultado = await db.query(`DELETE FROM autores WHERE id = ${id}`);
-    return true;
+    const resultado = await db.query(`DELETE FROM autores WHERE id = $1`, [id]);
+    return resultado;
 }
 
 exports.listarAutores = async function() {
