@@ -1,9 +1,9 @@
 const express = require('express');
+const cors = require('cors');
+const email = require('./config/email');
 const app = express();
 const port = 8086;
-app.use(express.json());
 const bodyParser = require('body-parser');
-const email = require('./config/email');
 
 const Locatario = require('./entidades/locatario');
 const Livro = require('./entidades/livro');
@@ -17,6 +17,8 @@ const editoraController = require('./controller/editoraController');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.json());
+app.use(cors());
 
 app.get('/login', function (req, res) {
     console.log('Funcionando!')
@@ -65,7 +67,7 @@ app.get('/cadastrarLocatario', function (req, res) {
 })
 
 app.post('/cadastrarLocatario', function (req, res) {
-    const novo_locatario = new Locatario(req.body.id, req.body.nome, req.body.dataNascimento, req.body.email, req.body.senha, req.body.telefone, req.body.tipo);
+    const novo_locatario = new Locatario(req.body.id, req.body.nome, req.body.data_nascimento, req.body.email, req.body.senha, req.body.telefone, req.body.tipo);
     
     const resultado = locatarioController.criarLocatario(novo_locatario);
     resultado.then(resp => {
