@@ -14,6 +14,7 @@ exports.removerAutor = async function(id) {
 }
 
 exports.listarAutores = async function() {
-    const autores = await db.query('SELECT nome FROM autores');
+    const autores = await db.query('SELECT * FROM autores');
+    //console.log(autores.rows)
     return autores.rows;
 }
