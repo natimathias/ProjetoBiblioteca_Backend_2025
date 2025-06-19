@@ -6,12 +6,7 @@ exports.criarLivro = async function (novo_livro) {
         [novo_livro.nome, novo_livro.tiulo, novo_livro.qt_disponivel, novo_livro.isbn, novo_livro.id_autores, novo_livro.edicao, novo_livro.id_edicao, novo_livro.caminho_imagens], true
     );
 
-    return "Livro cadastrado com sucesso!"
-}
-
-exports.removerLivro = async function (id) {
-    const resultado = await db.query(`DELETE FROM livros WHERE id_livro = ${id}`);
-    return true;
+    return;
 }
 
 exports.listarLivros = async function () {

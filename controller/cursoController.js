@@ -19,4 +19,3 @@ exports.listarCursos = async function() {
 exports.removerCurso = async function(id) {
     await cursoDAO.removerCurso(id);
 }
-

@@ -138,6 +138,13 @@ app.post('/cadastrarCurso', async function (req, res) {
     return;
 });
 
+app.get('/removerCurso/:id', function (req, res) {
+    console.log(req.params.id);
+    const resultado = cursoController.removerCurso(req.params.id);
+    resultado.then(res.status(201).json({ 'message': 'Curso removido com sucesso!' }));
+});
+
+
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}...`);
 })

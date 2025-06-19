@@ -9,11 +9,11 @@ exports.criarCurso = async function(novo_curso) {
 }
 
 exports.removerCurso = async function(id) {
-    const resultado = await db.query(`DELETE FROM cursos WHERE id = $1`, [id]);
+    const resultado = await db.query(`DELETE FROM cursos WHERE id = ${id}`);
     return resultado;
 }
 
 exports.listarCursos = async function() {
-    const cursos = await db.query('SELECT nome FROM cursos');
+    const cursos = await db.query('SELECT * FROM cursos');
     return cursos.rows;
 }
