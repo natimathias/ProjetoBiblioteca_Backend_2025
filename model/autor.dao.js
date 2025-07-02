@@ -1,10 +1,7 @@
 const db = require('../config/database');
 
 exports.criarAutor = async function(novo_autor) {
-    const resposta = await db.query(
-        'INSERT INTO autores (nome) VALUES ($1)',
-        [novo_autor.nome], true
-    );
+    const resposta = await db.query('INSERT INTO autores (nome) VALUES ($1)',[novo_autor.nome], true);
     return;
 }
 
