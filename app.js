@@ -98,28 +98,24 @@ app.get('/removerLocatario/:id', function (req, res) {
 });
 
 // //Rotas Livros
-// app.get('/listarLivros', function (req, res) {
-//     console.log('Funcionou')
-//     const livros = livroController.listarLivros();
-//     res.json(livros);
-//     return;
-// });
+app.get('/listarLivros', function (req, res) {
+    console.log('Funcionou')
+    const livros = livroController.listarLivros();
+    res.json(livros);
+    return;
+});
 
-// app.get('/cadastroLivro', function (req, res) {
-//     res.render('CadastroLivro');
-// })
+app.post('/cadastroLivro', function (req, res) {
+    const novo_livro = new Livro(req.body.id, req.body.nome, req.body.titulo, req.body.qt_disponivel, req.body.isbn, req.body.id_autores, req.body.edicao, req.body.id_editora, req.body.caminho_imagens);
 
-// app.post('/cadastroLivro', function (req, res) {
-//     const novo_livro = new Livro(req.body.id, req.body.nome, req.body.titulo, req.body.qt_disponivel, req.body.isbn, req.body.id_autores, req.body.edicao, req.body.id_editora, req.body.caminho_imagens);
-
-//     const resultado = livroController.criarLivro(novo_livro);
-//     resultado.then(resp => {
-//         if (resp.length > 0) {
-//             res.render('CadastroLivro', { livro: novo_livro, mensagem: resp });
-//         }
-//         res.redirect('/catalogo')
-//     })
-// })
+    const resultado = livroController.cadastrarLivro(novo_livro);
+    resultado.then(resp => {
+        if (resp.length > 0) {
+            res.render('CadastroLivro', { livro: novo_livro, mensagem: resp });
+        }
+        res.redirect('/catalogo')
+    })
+})
 
 // app.post('/removerLivro', function (req, res) {})
 

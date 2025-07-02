@@ -1,20 +1,19 @@
 const livroDAO = require('../model/livro.dao');
 
-const criarLivro = async function (novo_livro) {
-    const erros = [];
+exports.cadastrarLivro = async function (novo_livro) {
+    const caminho = path.join(__dirname, '..', 'imagens/');
+    const id_livro = await livroDAO.cadastrarLivro(novo_livro);
 
-    if (erros.length > 0) {
-        return erros;
-    }
+    extensao_arquivo = novo_produto.imagem.name.split(".");
 
-    await livroDAO.criarLivro(novo_livro);
-    return [];
+    novo_produto.imagem.mv(caminho + id_livro + '.' + extensao_arquivo.pop());
+
+    return true;
 }
 
-const listarLivros = async function () {
+exports.listarLivros = async function () {
     let livros = await livroDAO.listarLivros();
     return livros;
 }
 
 
-module.exports = { criarLivro, listarLivros }
