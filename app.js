@@ -106,7 +106,7 @@ app.get('/listarLivros', function (req, res) {
 });
 
 app.post('/cadastroLivro', function (req, res) {
-    const novo_livro = new Livro(req.body.id, req.body.nome, req.body.titulo, req.body.qt_disponivel, req.body.isbn, req.body.id_autores, req.body.edicao, req.body.id_editora, req.body.caminho_imagens);
+    const novo_livro = new Livro(req.body.titulo, req.body.qt_disponivel, req.body.isbn, req.body.id_autores, req.body.edicao, req.body.id_editora, req.body.caminho_imagens);
 
     const resultado = livroController.cadastrarLivro(novo_livro);
     resultado.then(resp => {
