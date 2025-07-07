@@ -78,7 +78,8 @@ app.get('/listarLocatarios', function (req, res) {
 })
 
 app.post('/cadastrarLocatario', function (req, res) {
-    const novo_locatario = new Locatario(req.body.id, req.body.nome, req.body.data_nascimento, req.body.email, req.body.senha, req.body.telefone, req.body.tipo);
+    console.log("Dados recebidos:", req.body);
+    const novo_locatario = new Locatario(req.body.id, req.body.nome, req.body.dataNascimento, req.body.email, req.body.senha, req.body.telefone, req.body.tipo);
 
     const resultado = locatarioController.criarLocatario(novo_locatario);
     resultado.then(resp => {
