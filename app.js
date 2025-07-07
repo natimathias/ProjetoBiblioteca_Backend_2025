@@ -16,6 +16,8 @@ const autorController = require('./controller/autorController');
 const locatarioController = require('./controller/locatarioController');
 const editoraController = require('./controller/editoraController');
 const cursoController = require('./controller/cursoController')
+const emprestimoController = require('./controller/emprestimoController');
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -143,6 +145,53 @@ app.get('/removerCurso/:id', function (req, res) {
     const resultado = cursoController.removerCurso(req.params.id);
     resultado.then(res.status(201).json({ 'message': 'Curso removido com sucesso!' }));
 });
+
+////
+app.post('/emprestarLivro', async (req, res) => {
+  const resultado = await emprestimoController.realizarEmprestimo(req.body);
+
+  if (resultado.erro) {
+    return res.status(400).json({ erro: resultado.erro });
+  }
+
+  res.status(201).json({ mensagem: 'Empréstimo realizado com sucesso.', emprestimo: resultado });
+});
+
+/////
+app.get('/listarLivros', async (req, res) => {
+  const livros = await livroController.listarLivros();
+  res.json(livros);
+});
+
+app.post('/realizarEmprestimo', async (req, res) => {
+  const resultado = await emprestimoController.realizarEmprestimo(req.body);
+
+  if (resultado.erro) {
+    return res.status(400).json({ erro: resultado.erro });
+  }
+
+  res.status(201).json({ mensagem: "Empréstimo realizado com sucesso!" });
+});
+///
+const emprestimoController = require('./controller/emprestimoController');
+
+app.post('/emprestarLivro', async (req, res) => {
+  const { id_locatario, id_livro } = req.body;
+
+  if (!id_locatario || !id_livro) {
+    return res.status(400).json({ erro: "Dados incompletos para empréstimo." });
+  }
+
+  const resultado = await emprestimoController.realizarEmprestimo({ id_locatario, id_livro });
+
+  if (resultado.erro) {
+    return res.status(400).json({ erro: resultado.erro });
+  }
+
+  return res.status(201).json({ mensagem: resultado.mensagem });
+});
+
+
 
 
 app.listen(port, () => {

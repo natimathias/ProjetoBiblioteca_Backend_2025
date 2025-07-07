@@ -1,20 +1,35 @@
+const path = require('path');
 const livroDAO = require('../model/livro.dao');
+const fs = require('fs');
 
-const criarLivro = async function (novo_livro) {
-    const erros = [];
+exports.cadastrarLivro = async function (novo_livro) {
+  const caminho = path.join(__dirname, '..', 'imagens');
 
-    if (erros.length > 0) {
-        return erros;
+  const id_livro = await livroDAO.cadastrarLivro(novo_livro);
+
+  if (novo_livro.imagem) {
+    const extensao = novo_livro.imagem.name.split('.').pop();
+    const nomeArquivo = `${id_livro}.${extensao}`;
+    const caminhoCompleto = path.join(caminho, nomeArquivo);
+
+    if (!fs.existsSync(caminho)) {
+      fs.mkdirSync(caminho);
     }
 
-    await livroDAO.criarLivro(novo_livro);
-    return [];
-}
+    await novo_livro.imagem.mv(caminhoCompleto);
+  }
 
-const listarLivros = async function () {
-    let livros = await livroDAO.listarLivros();
-    return livros;
-}
+  return true;
+};
 
+exports.listarLivros = async function () {
+  return await livroDAO.listarLivros();
+};
 
-module.exports = { criarLivro, listarLivros }
+exports.buscarPorId = async function (id) {
+  return await livroDAO.buscarPorId(id);
+};
+
+exports.reduzirQuantidade = async function (id) {
+  return await livroDAO.reduzirQuantidade(id);
+};
