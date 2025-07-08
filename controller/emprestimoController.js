@@ -3,7 +3,7 @@ const livroController = require('./livroController');
 const locatarioController = require('./locatarioController');
 const emprestimoDAO = require('../model/emprestimo.dao');
 
-async function realizarEmprestimo({ id_locatario, id_livro }) {
+exports.realizarEmprestimo = async function ({ id_locatario, id_livro }) {
   const locatario = await locatarioController.buscarPorId(id_locatario);
   const livro = await livroController.buscarPorId(id_livro);
 
@@ -36,4 +36,4 @@ async function realizarEmprestimo({ id_locatario, id_livro }) {
   return emprestimoSalvo;
 }
 
-module.exports = { realizarEmprestimo };
+

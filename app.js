@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
 const email = require('./config/email');
 const app = express();
 const port = 8086;
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const Locatario = require('./entidades/locatario');
 const Livro = require('./entidades/livro');
@@ -15,7 +17,7 @@ const livroController = require('./controller/livroController');
 const autorController = require('./controller/autorController');
 const locatarioController = require('./controller/locatarioController');
 const editoraController = require('./controller/editoraController');
-const cursoController = require('./controller/cursoController')
+const cursoController = require('./controller/cursoController');
 const emprestimoController = require('./controller/emprestimoController');
 
 
@@ -24,10 +26,16 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
 
-app.get('/login', function (req, res) {
-    console.log('Funcionando!')
-
-})
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'imagens'));
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + ext);
+  }
+});
+const upload = multer({ storage });
 
 //Rotas Autor
 app.get('/listarAutores', async function (req, res) {
@@ -101,26 +109,57 @@ app.get('/removerLocatario/:id', function (req, res) {
 });
 
 // //Rotas Livros
-app.get('/listarLivros', function (req, res) {
+app.get('/listarLivros', async function(req, res) {
     console.log('Funcionou')
-    const livros = livroController.listarLivros();
+    const livros = await livroController.listarLivros();
     res.json(livros);
     return;
 });
 
-app.post('/cadastroLivro', function (req, res) {
-    const novo_livro = new Livro(req.body.titulo, req.body.qt_disponivel, req.body.isbn, req.body.id_autores, req.body.edicao, req.body.id_editora, req.body.caminho_imagens);
+app.post('/cadastrarLivro', upload.single('capa'), async (req, res) => {
+  try {
+    const { titulo, qt_disponivel, isbn, autor, editora, edicao } = req.body;
+    if (!req.file) {
+      return res.status(400).json({ message: 'Selecione uma capa para o livro.' });
+    }
 
-    const resultado = livroController.cadastrarLivro(novo_livro);
-    resultado.then(resp => {
-        if (resp.length > 0) {
-            res.render('CadastroLivro', { livro: novo_livro, mensagem: resp });
-        }
-        res.redirect('/catalogo')
-    })
-})
+    const novoLivro = {
+      titulo,
+      qt_disponivel: Number(qt_disponivel),
+      isbn,
+      id_autores: Number(autor),
+      edicao,
+      id_editora: Number(editora),
+      caminho_imagens: req.file.filename,
+    };
+
+    await livroController.cadastrarLivro(novoLivro);
+
+    res.status(201).json({ message: 'Livro cadastrado com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao cadastrar livro:', error);
+    res.status(500).json({ message: 'Erro ao cadastrar livro.' });
+  }
+});
 
 // app.post('/removerLivro', function (req, res) {})
+
+app.post('/emprestarLivro', async function(req, res) {
+  const { id_locatario, id_livro } = req.body;
+
+  if (!id_locatario || !id_livro) {
+    return res.status(400).json({ erro: "Dados incompletos para empréstimo." });
+  }
+
+  const resultado = await emprestimoController.realizarEmprestimo({ id_locatario, id_livro });
+
+  if (resultado.erro) {
+    return res.status(400).json({ erro: resultado.erro });
+  }
+
+  return res.status(201).json({ mensagem: resultado.mensagem });
+});
+
 
 //Rotas cursos
 app.get('/listarCursos', async function (req, res) {
@@ -142,53 +181,6 @@ app.get('/removerCurso/:id', function (req, res) {
     const resultado = cursoController.removerCurso(req.params.id);
     resultado.then(res.status(201).json({ 'message': 'Curso removido com sucesso!' }));
 });
-
-////
-app.post('/emprestarLivro', async (req, res) => {
-  const resultado = await emprestimoController.realizarEmprestimo(req.body);
-
-  if (resultado.erro) {
-    return res.status(400).json({ erro: resultado.erro });
-  }
-
-  res.status(201).json({ mensagem: 'Empréstimo realizado com sucesso.', emprestimo: resultado });
-});
-
-/////
-app.get('/listarLivros', async (req, res) => {
-  const livros = await livroController.listarLivros();
-  res.json(livros);
-});
-
-app.post('/realizarEmprestimo', async (req, res) => {
-  const resultado = await emprestimoController.realizarEmprestimo(req.body);
-
-  if (resultado.erro) {
-    return res.status(400).json({ erro: resultado.erro });
-  }
-
-  res.status(201).json({ mensagem: "Empréstimo realizado com sucesso!" });
-});
-///
-const emprestimoController = require('./controller/emprestimoController');
-
-app.post('/emprestarLivro', async (req, res) => {
-  const { id_locatario, id_livro } = req.body;
-
-  if (!id_locatario || !id_livro) {
-    return res.status(400).json({ erro: "Dados incompletos para empréstimo." });
-  }
-
-  const resultado = await emprestimoController.realizarEmprestimo({ id_locatario, id_livro });
-
-  if (resultado.erro) {
-    return res.status(400).json({ erro: resultado.erro });
-  }
-
-  return res.status(201).json({ mensagem: resultado.mensagem });
-});
-
-
 
 
 app.listen(port, () => {
