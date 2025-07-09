@@ -9,8 +9,21 @@ exports.cadastrarLivro = async function (novo_livro) {
 };
 
 exports.listarLivros = async function () {
-  const livros = await db.query('SELECT * FROM livros WHERE disponivel = true');
-  return livros.rows;
+  const query = `
+    SELECT 
+      livros.*,
+      autores.nome AS autor_nome,
+      editora.nome AS editora_nome,
+      categoria.nome AS categoria_nome
+    FROM livros
+    JOIN autores ON livros.id_autores = autores.id
+    JOIN editora ON livros.id_editora = editora.id
+    JOIN categoria ON livros.id_categoria = categoria.id
+    WHERE livros.disponivel = true
+  `;
+  
+  const resultado = await db.query(query);
+  return resultado.rows;
 };
 
 exports.indisponibilizarLivro = async function (id) {
