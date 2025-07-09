@@ -243,6 +243,11 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.get('/pesquisarLivros', (req, res) => {
+  console.log("🔍 Rota /pesquisarLivros chamada com termo:", req.query.termo);
+  return livroController.pesquisarLivros(req, res);
+});
+
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}...`);
 });
