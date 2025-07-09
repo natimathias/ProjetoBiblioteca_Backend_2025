@@ -8,8 +8,8 @@ exports.criarCurso = async function(novo_curso) {
     return;
 }
 
-exports.removerCurso = async function(id) {
-    const resultado = await db.query(`DELETE FROM cursos WHERE id = ${id}`);
+exports.deixarIndisponivelCurso = async function(id) {
+    const resultado = await db.query('UPDATE cursos SET disponivel = false WHERE id = $1', [id]);
     return resultado;
 }
 

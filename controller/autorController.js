@@ -16,7 +16,7 @@ exports.listarAutores = async function() {
     return autores;
 }
 
-exports.removerAutor = async function(id) {
-    await autorDAO.removerAutor(id);
+exports.deixarIndisponivelAutor = async function(id) {
+    await autorDAO.deixarIndisponivelAutor(id);
 }
 

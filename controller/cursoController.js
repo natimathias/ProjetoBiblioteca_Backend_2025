@@ -16,6 +16,6 @@ exports.listarCursos = async function() {
     return cursos;
 }
 
-exports.removerCurso = async function(id) {
-    await cursoDAO.removerCurso(id);
+exports.deixarIndisponivelCurso = async function(id) {
+    await cursoDAO.deixarIndisponivelCurso(id);
 }

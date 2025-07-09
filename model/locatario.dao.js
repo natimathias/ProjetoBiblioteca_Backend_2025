@@ -9,9 +9,9 @@ exports.criarLocatario = async function (novo_locatario) {
     return;
 }
 
-exports.removerLocatario = async function (id) {
-    const { rows } = await db.query(`UPDATE locatario SET ativo = false WHERE id = '${id}'`);
-    return rows;
+exports.deixarIndisponivelLocatario = async function(id) {
+    const resultado = await db.query('UPDATE locatario SET disponivel = false WHERE id = $1', [id]);
+    return resultado;
 }
 
 exports.listarLocatarios = async function () {

@@ -16,6 +16,6 @@ exports.listarEditoras = async function() {
     return editora;
 }
 
-exports.removerEditora = async function(id) {
-    await editoraDAO.removerEditora(id);
+exports.deixarIndisponivelEditora = async function(id) {
+    await editoraDAO.deixarIndisponivelEditora(id);
 }

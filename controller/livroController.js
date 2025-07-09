@@ -8,6 +8,10 @@ exports.listarLivros = async function () {
   return await livroDAO.listarLivros();
 };
 
+exports.indisponibilizarLivro = async function (id) {
+  return await livroDAO.indisponibilizarLivro(id);
+};
+
 exports.buscarPorId = async function (id) {
   return await livroDAO.buscarPorId(id);
 };

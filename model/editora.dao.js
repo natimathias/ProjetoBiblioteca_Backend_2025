@@ -5,8 +5,8 @@ exports.criarEditora = async function(nova_editora) {
     return;
 }
 
-exports.removerEditora = async function(id) {
-    const resultado = await db.query(`DELETE FROM editora WHERE id = ${id}`);
+exports.deixarIndisponivelEditora = async function(id) {
+    const resultado = await db.query('UPDATE editora SET disponivel = false WHERE id = $1', [id]);
     return resultado;
 }
 

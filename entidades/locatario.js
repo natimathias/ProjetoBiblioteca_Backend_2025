@@ -1,5 +1,5 @@
 class Locatario {
-    constructor(id, nome, data_nascimento, email, senha, telefone, tipo) {
+    constructor(id, nome, data_nascimento, email, senha, telefone, tipo, disponivel) {
         this.id = id;
         this.nome = nome;
         this.data_nascimento = data_nascimento;
@@ -7,6 +7,7 @@ class Locatario {
         this.senha = senha;
         this.telefone = telefone;
         this.tipo = tipo;
+        this.disponivel = disponivel;
     }
 }
 

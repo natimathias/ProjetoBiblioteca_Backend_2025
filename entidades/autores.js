@@ -1,8 +1,8 @@
 class Autores {
-    constructor(id, nome) {
+    constructor(id, nome, disponivel) {
         this.id = id;
         this.nome = nome;
-
+        this.disponivel = disponivel;
     }
 }
 

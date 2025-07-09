@@ -17,9 +17,9 @@ exports.listarLocatarios = async function () {
     return locatarios;
 };
 
-exports.removerLocatario = async function(id) {
-    return await locatarioDAO.removerLocatario(id);
-};
+exports.deixarIndisponivelLocatario = async function(id) {
+    await locatarioDAO.deixarIndisponivelLocatario(id);
+}
 
 exports.buscarPorId = async function(id) {
     const locatarios = await locatarioDAO.listarLocatarios();
