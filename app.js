@@ -40,75 +40,77 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-//Rotas Autor
-app.get('/listarAutores', async function (req, res) {
-    const autores = await autorController.listarAutores();
-    res.json(autores);
-    return;
-});
-
-app.post('/cadastrarAutor', async function (req, res) {
-    const novo_autor = new Autor(null, req.body.nome);
-    await autorController.criarAutor(novo_autor);
-    res.status(201).json({ 'message': 'Autor criado com sucesso!' });
-    return;
-});
-
-app.get('/deixarIndisponivelAutor/:id', function (req, res) {
-    const resultado = autorController.deixarIndisponivelAutor(req.params.id);
-    resultado.then(res.status(201).json({ 'message': 'Autor marcado como indisponível!' }));
-});
-
-//Rotas Editora
-app.get('/listarEditoras', async function (req, res) {
-    const editoras = await editoraController.listarEditoras();
-    res.json(editoras);
-    return;
-});
-
-app.post('/cadastrarEditora', async function (req, res) {
-    const nova_editora = new Editora(req.body.id, req.body.nome, req.body.endereco, req.body.telefone);
-    await editoraController.criarEditora(nova_editora);
-    res.status(201).json({ 'message': 'Editora criada com sucesso!' });
-    return;
-});
-
-app.get('/deixarIndisponivelEditora/:id', function (req, res) {
-    const resultado = editoraController.deixarIndisponivelEditora(req.params.id);
-    resultado.then(res.status(201).json({ 'message': 'Editora marcada como indisponível!' }));
-});
-
-//Rotas Locatario
-app.get('/listarLocatarios', function (req, res) {
-    const locatarios = locatarioController.listarLocatarios();
-    res.json(locatarios);
-    return;
-})
-
-app.post('/cadastrarLocatario', function (req, res) {
-    console.log("Dados recebidos:", req.body);
-    const novo_locatario = new Locatario(req.body.id, req.body.nome, req.body.dataNascimento, req.body.email, req.body.senha, req.body.telefone, req.body.tipo);
-
-    const resultado = locatarioController.criarLocatario(novo_locatario);
-    resultado.then(resp => {
-        if (resp.length > 0) {
-            res.render('cadastroUsuario', { locatario: novo_locatario, mensagem: resp });
-        } else {
-            email(novo_locatario.email, 'Cadastro no sistema', 'Seu cadastro foi realizado com sucesso!');
-            res.status(201).json({ 'message': 'Locatário cadastrado com sucesso!' });
-        }
-    })
-})
-
-app.get('/deixarIndisponivelLocatario/:id', function (req, res) {
-    const resultado = locatarioController.deixarIndisponivelLocatario(req.params.id);
-    resultado.then(res.status(201).json({ 'message': 'Locatário indisponível!' }));
-});
-
-// //Rotas Livros
 app.use('/imagens', express.static(path.join(__dirname, 'imagens')));
 
-app.get('/listarLivros', async function(req, res) {
+// Autores
+app.get('/listarAutores', async (req, res) => {
+  const autores = await autorController.listarAutores();
+  res.json(autores);
+});
+
+app.post('/cadastrarAutor', async (req, res) => {
+  const novo_autor = new Autor(null, req.body.nome);
+  await autorController.criarAutor(novo_autor);
+  res.status(201).json({ message: 'Autor criado com sucesso!' });
+});
+
+app.get('/deixarIndisponivelAutor/:id', async (req, res) => {
+  await autorController.deixarIndisponivelAutor(req.params.id);
+  res.status(201).json({ message: 'Autor marcado como indisponível!' });
+});
+
+// Editoras
+app.get('/listarEditoras', async (req, res) => {
+  const editoras = await editoraController.listarEditoras();
+  res.json(editoras);
+});
+
+app.post('/cadastrarEditora', async (req, res) => {
+  const nova_editora = new Editora(req.body.id, req.body.nome, req.body.endereco, req.body.telefone);
+  await editoraController.criarEditora(nova_editora);
+  res.status(201).json({ message: 'Editora criada com sucesso!' });
+});
+
+app.get('/deixarIndisponivelEditora/:id', async (req, res) => {
+  await editoraController.deixarIndisponivelEditora(req.params.id);
+  res.status(201).json({ message: 'Editora marcada como indisponível!' });
+});
+
+// Locatários
+app.get('/listarLocatarios', async (req, res) => {
+  const locatarios = await locatarioController.listarLocatarios();
+  res.json(locatarios);
+});
+
+app.post('/cadastrarLocatario', async (req, res) => {
+  console.log("Dados recebidos:", req.body);
+  const novo_locatario = new Locatario(
+    req.body.id,
+    req.body.nome,
+    req.body.dataNascimento,
+    req.body.email,
+    req.body.senha,
+    req.body.telefone, 
+    req.body.tipo
+  );
+
+  const resultado = await locatarioController.criarLocatario(novo_locatario);
+
+  if (resultado.length > 0) {
+    res.status(400).json({ mensagem: resultado });
+  } else {
+    email(novo_locatario.email, 'Cadastro no sistema', 'Seu cadastro foi realizado com sucesso!');
+    res.status(201).json({ message: 'Locatário cadastrado com sucesso!' });
+  }
+});
+
+app.get('/deixarIndisponivelLocatario/:id', async (req, res) => {
+  await locatarioController.deixarIndisponivelLocatario(req.params.id);
+  res.status(201).json({ message: 'Locatário indisponível!' });
+});
+
+// Livros
+app.get('/listarLivros', async (req, res) => {
   const livros = await livroController.listarLivros();
   res.json(livros);
 });
@@ -116,6 +118,7 @@ app.get('/listarLivros', async function(req, res) {
 app.post('/cadastrarLivro', upload.single('capa'), async (req, res) => {
   try {
     const { titulo, qt_disponivel, isbn, autor, editora, edicao, categoria, subcategoria } = req.body;
+
     if (!req.file) {
       return res.status(400).json({ message: 'Selecione uma capa para o livro.' });
     }
@@ -133,7 +136,6 @@ app.post('/cadastrarLivro', upload.single('capa'), async (req, res) => {
     };
 
     await livroController.cadastrarLivro(novoLivro);
-
     res.status(201).json({ message: 'Livro cadastrado com sucesso!' });
   } catch (error) {
     console.error('Erro ao cadastrar livro:', error);
@@ -151,7 +153,8 @@ app.post('/indisponibilizarLivro/:id', async (req, res) => {
   }
 });
 
-app.post('/emprestarLivro', async function(req, res) {
+// Empréstimos
+app.post('/emprestarLivro', async (req, res) => {
   const { id_locatario, id_livro } = req.body;
 
   if (!id_locatario || !id_livro) {
@@ -167,64 +170,79 @@ app.post('/emprestarLivro', async function(req, res) {
   return res.status(201).json({ mensagem: resultado.mensagem });
 });
 
-
-//Rotas cursos
-app.get('/listarCursos', async function (req, res) {
-    const cursos = await cursoController.listarCursos();
-    res.json(cursos);
-    return;
+// Cursos
+app.get('/listarCursos', async (req, res) => {
+  const cursos = await cursoController.listarCursos();
+  res.json(cursos);
 });
 
-app.post('/cadastrarCurso', async function (req, res) {
-    const novo_curso = new Curso(null, req.body.nome, req.body.codigo);
-    await cursoController.criarCurso(novo_curso);
-    res.status(201).json({ 'message': 'Curso criado com sucesso!' });
-    return;
+app.post('/cadastrarCurso', async (req, res) => {
+  const novo_curso = new Curso(null, req.body.nome, req.body.codigo);
+  await cursoController.criarCurso(novo_curso);
+  res.status(201).json({ message: 'Curso criado com sucesso!' });
 });
 
-app.get('/deixarIndisponivelCurso/:id', function (req, res) {
-    const resultado = cursoController.deixarIndisponivelCurso(req.params.id);
-    resultado.then(res.status(201).json({ 'message': 'Curso marcado como indisponível!' }));
+app.get('/deixarIndisponivelCurso/:id', async (req, res) => {
+  await cursoController.deixarIndisponivelCurso(req.params.id);
+  res.status(201).json({ message: 'Curso marcado como indisponível!' });
 });
 
-//Rotas Categoria
-app.get('/listarCategorias', async function (req, res) {
-    const categorias = await categoriaController.listarCategorias();
-    res.json(categorias);
-    return;
+// Categorias
+app.get('/listarCategorias', async (req, res) => {
+  const categorias = await categoriaController.listarCategorias();
+  res.json(categorias);
 });
 
-app.post('/cadastrarCategoria', async function (req, res) {
-    const nova_categoria = new Categoria(null, req.body.nome);
-    await categoriaController.criarCategoria(nova_categoria);
-    res.status(201).json({ 'message': 'Categoria criada com sucesso!' });
-    return;
+app.post('/cadastrarCategoria', async (req, res) => {
+  const nova_categoria = new Categoria(null, req.body.nome);
+  await categoriaController.criarCategoria(nova_categoria);
+  res.status(201).json({ message: 'Categoria criada com sucesso!' });
 });
 
-app.get('/deixarIndisponivelCategoria/:id', function (req, res) {
-    const resultado = categoriaController.deixarIndisponivelCategoria(req.params.id);
-    resultado.then(res.status(201).json({ 'message': 'Categoria marcada como indisponível!' }));
+app.get('/deixarIndisponivelCategoria/:id', async (req, res) => {
+  await categoriaController.deixarIndisponivelCategoria(req.params.id);
+  res.status(201).json({ message: 'Categoria marcada como indisponível!' });
 });
 
-//Rotas subCategoria
-app.get('/listarSubCategorias', async function (req, res) {
-    const subcategorias = await subCategoriaController.listarSubCategorias();
-    res.json(subcategorias);
-    return;
+// Subcategorias
+app.get('/listarSubCategorias', async (req, res) => {
+  const subcategorias = await subCategoriaController.listarSubCategorias();
+  res.json(subcategorias);
 });
 
-app.post('/cadastrarSubCategoria', async function (req, res) {
-    const nova_subcategoria = new subCategoria(null, req.body.nome);
-    await subCategoriaController.criarSubCategoria(nova_subcategoria);
-    res.status(201).json({ 'message': 'SubCategoria criada com sucesso!' });
-    return;
+app.post('/cadastrarSubCategoria', async (req, res) => {
+  const nova_subcategoria = new subCategoria(null, req.body.nome);
+  await subCategoriaController.criarSubCategoria(nova_subcategoria);
+  res.status(201).json({ message: 'SubCategoria criada com sucesso!' });
 });
 
-app.get('/deixarIndisponivelSubCategoria/:id', function (req, res) {
-    const resultado = subCategoriaController.deixarIndisponivelSubCategoria(req.params.id);
-    resultado.then(res.status(201).json({ 'message': 'SubCategoria marcada como indisponível!' }));
+app.get('/deixarIndisponivelSubCategoria/:id', async (req, res) => {
+  await subCategoriaController.deixarIndisponivelSubCategoria(req.params.id);
+  res.status(201).json({ message: 'SubCategoria marcada como indisponível!' });
+});
+
+// Login
+app.post('/login', async (req, res) => {
+  const { email, senha } = req.body;
+
+  if (!email || !senha) {
+    return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
+  }
+
+  try {
+    const resultado = await locatarioController.verificarLogin(email, senha);
+
+    if (resultado.length > 0) {
+      res.status(200).json({ message: 'Login realizado com sucesso!' });
+    } else {
+      res.status(401).json({ message: 'Usuário ou senha inválidos.' });
+    }
+  } catch (error) {
+    console.error('Erro ao realizar login:', error);
+    res.status(500).json({ message: 'Erro interno no servidor.' });
+  }
 });
 
 app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}...`);
-})
+  console.log(`Servidor rodando na porta ${port}...`);
+});
