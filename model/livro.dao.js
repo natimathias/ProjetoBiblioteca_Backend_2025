@@ -26,6 +26,29 @@ exports.listarLivros = async function () {
   return resultado.rows;
 };
 
+exports.pesquisarLivros = async function (termo) {
+  console.log("📦 Buscando livros no DAO com termo:", termo);
+
+  const resultado = await db.query(`
+    SELECT livros.*, autores.nome AS autor_nome, editora.nome AS editora_nome
+    FROM livros
+    JOIN autores ON livros.id_autores = autores.id
+    JOIN editora ON livros.id_editora = editora.id
+    WHERE 
+      (
+        LOWER(livros.titulo) LIKE LOWER($1)
+        OR LOWER(autores.nome) LIKE LOWER($1)
+        OR LOWER(editora.nome) LIKE LOWER($1)
+        OR CAST(livros.isbn) LIKE $1
+      )
+      AND livros.disponivel = true
+  `, [`%${termo}%`]);
+
+  console.log("🔍 Resultado encontrado:", resultado.rows); // <- VERIFICAR SE HÁ RESULTADO
+  return resultado.rows;
+};
+;
+
 exports.indisponibilizarLivro = async function (id) {
   return await db.query('UPDATE livros SET disponivel = false WHERE id = $1', [id]);
 };
