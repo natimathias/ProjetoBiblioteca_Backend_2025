@@ -19,3 +19,11 @@ exports.listarCursos = async function() {
 exports.deixarIndisponivelCurso = async function(id) {
     await cursoDAO.deixarIndisponivelCurso(id);
 }
+
+exports.buscarPorId = async function (id) {
+    return await cursoDAO.buscarPorId(id);
+};
+
+exports.editarCurso = async function (curso) {
+    return await cursoDAO.editarCurso(curso);
+};

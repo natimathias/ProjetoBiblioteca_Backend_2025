@@ -15,23 +15,30 @@ var transporter = nodemailer.createTransport({
 });
 
 var mailOptions = {
-  from: '',
+  from: 'thcnatalia19@gmail.com',
   to: '',
   subject: '',
   text: ''
 };
 
 let enviarEmail = function(emailDestino, assunto, mensagem){
-    mailOptions.to = emailDestino;
-    mailOptions.subject = assunto;
-    mailOptions.text = mensagem;
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-    });
+  if (!emailDestino || emailDestino.trim() === '') {
+    console.error("Nenhum destinatário definido.");
+    return;
+  }
+
+  mailOptions.to = emailDestino;
+  mailOptions.subject = assunto;
+  mailOptions.text = mensagem;
+
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log("Erro ao enviar e-mail:", error);
+    } else {
+      console.log('Email enviado com sucesso:', info.response);
+    }
+  });
 }
+
 
 module.exports = enviarEmail;

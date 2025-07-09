@@ -20,3 +20,11 @@ exports.deixarIndisponivelSubCategoria = async function(id) {
     await subCategoriaDAO.deixarIndisponivelSubCategoria(id);
 }
 
+exports.buscarPorId = async function (id) {
+    return await subCategoriaDAO.buscarPorId(id);
+};
+
+exports.editarSubCategoria = async function (subCategoria) {
+    return await subCategoriaDAO.editarSubCategoria(subCategoria);
+};
+

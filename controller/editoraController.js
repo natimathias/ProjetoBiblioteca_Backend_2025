@@ -19,3 +19,11 @@ exports.listarEditoras = async function() {
 exports.deixarIndisponivelEditora = async function(id) {
     await editoraDAO.deixarIndisponivelEditora(id);
 }
+
+exports.buscarPorId = async function (id) {
+    return await editoraDAO.buscarPorId(id);
+};
+
+exports.editarEditora = async function (editora) {
+    return await editoraDAO.editarEditora(editora);
+};

@@ -27,28 +27,35 @@ exports.listarLivros = async function () {
 };
 
 exports.pesquisarLivros = async function (termo) {
-  console.log("📦 Buscando livros no DAO com termo:", termo);
 
-  const resultado = await db.query(`
+  const query = `
     SELECT livros.*, autores.nome AS autor_nome, editora.nome AS editora_nome
     FROM livros
     JOIN autores ON livros.id_autores = autores.id
     JOIN editora ON livros.id_editora = editora.id
-    WHERE 
-      (
-        LOWER(livros.titulo) LIKE LOWER($1)
-        OR LOWER(autores.nome) LIKE LOWER($1)
-        OR LOWER(editora.nome) LIKE LOWER($1)
-        OR CAST(livros.isbn) LIKE $1
-      )
-      AND livros.disponivel = true
-  `, [`%${termo}%`]);
+    WHERE livros.disponivel = true
+    AND (
+      LOWER(livros.titulo) LIKE LOWER($1)
+      OR LOWER(autores.nome) LIKE LOWER($1)
+      OR LOWER(editora.nome) LIKE LOWER($1)
+      OR CAST(livros.isbn AS TEXT) LIKE $1
+    )`;
 
-  console.log("🔍 Resultado encontrado:", resultado.rows); // <- VERIFICAR SE HÁ RESULTADO
+  const valores = [`%${termo}%`];
+
+  const resultado = await db.query(query, valores);
   return resultado.rows;
 };
-;
 
 exports.indisponibilizarLivro = async function (id) {
   return await db.query('UPDATE livros SET disponivel = false WHERE id = $1', [id]);
+};
+
+exports.buscarPorId = async function (id) {
+    const resultado = await db.query('SELECT * FROM livros WHERE id = $1 AND disponivel = true', [id]);
+    return resultado.rows[0];
+};
+
+exports.editarLivro = async function (livro) {
+    return await db.query('UPDATE livros SET nome = $1 WHERE id = $2', [livro.nome, livro.id]);
 };

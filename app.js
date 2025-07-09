@@ -59,6 +59,16 @@ app.get('/deixarIndisponivelAutor/:id', async (req, res) => {
   res.status(201).json({ message: 'Autor marcado como indisponível!' });
 });
 
+app.get('/autor/:id', async (req, res) => {
+  const autor = await autorController.buscarPorId(req.params.id);
+  res.json(autor);
+});
+
+app.put('/editarAutor/:id', async (req, res) => {
+  await autorController.editarAutor(req.body);
+  res.status(200).json({ message: 'Autor atualizado com sucesso!' });
+});
+
 // Editoras
 app.get('/listarEditoras', async (req, res) => {
   const editoras = await editoraController.listarEditoras();
@@ -76,6 +86,16 @@ app.get('/deixarIndisponivelEditora/:id', async (req, res) => {
   res.status(201).json({ message: 'Editora marcada como indisponível!' });
 });
 
+app.get('/editora/:id', async (req, res) => {
+  const editora = await editoraController.buscarPorId(req.params.id);
+  res.json(editora);
+});
+
+app.put('/editarEditora/:id', async (req, res) => {
+  await editoraController.editarEditora(req.body);
+  res.status(200).json({ message: 'Editora atualizada com sucesso!' });
+});
+
 // Locatários
 app.get('/listarLocatarios', async (req, res) => {
   const locatarios = await locatarioController.listarLocatarios();
@@ -84,15 +104,7 @@ app.get('/listarLocatarios', async (req, res) => {
 
 app.post('/cadastrarLocatario', async (req, res) => {
   console.log("Dados recebidos:", req.body);
-  const novo_locatario = new Locatario(
-    req.body.id,
-    req.body.nome,
-    req.body.dataNascimento,
-    req.body.email,
-    req.body.senha,
-    req.body.telefone, 
-    req.body.tipo
-  );
+  const novo_locatario = new Locatario(req.body.id, req.body.nome, req.body.data_nascimento, req.body.email, req.body.senha, req.body.telefone, req.body.tipo);
 
   const resultado = await locatarioController.criarLocatario(novo_locatario);
 
@@ -107,6 +119,16 @@ app.post('/cadastrarLocatario', async (req, res) => {
 app.get('/deixarIndisponivelLocatario/:id', async (req, res) => {
   await locatarioController.deixarIndisponivelLocatario(req.params.id);
   res.status(201).json({ message: 'Locatário indisponível!' });
+});
+
+app.get('/locatario/:id', async (req, res) => {
+  const locatario = await locatarioController.buscarPorId(req.params.id);
+  res.json(locatario);
+});
+
+app.put('/editarLocatario/:id', async (req, res) => {
+  await locatarioController.editarLocatario(req.body);
+  res.status(200).json({ message: 'Locatario atualizado com sucesso!' });
 });
 
 // Livros
@@ -153,6 +175,16 @@ app.post('/indisponibilizarLivro/:id', async (req, res) => {
   }
 });
 
+app.get('/livro/:id', async (req, res) => {
+  const livro = await livroController.buscarPorId(req.params.id);
+  res.json(livro);
+});
+
+app.put('/editarLivro/:id', async (req, res) => {
+  await livroController.editarLivro(req.body);
+  res.status(200).json({ message: 'Livro atualizado com sucesso!' });
+});
+
 // Empréstimos
 app.post('/emprestarLivro', async (req, res) => {
   const { id_locatario, id_livro } = req.body;
@@ -187,6 +219,16 @@ app.get('/deixarIndisponivelCurso/:id', async (req, res) => {
   res.status(201).json({ message: 'Curso marcado como indisponível!' });
 });
 
+app.get('/curso/:id', async (req, res) => {
+  const curso = await cursoController.buscarPorId(req.params.id);
+  res.json(curso);
+});
+
+app.put('/editarCurso/:id', async (req, res) => {
+  await cursoController.editarCurso(req.body);
+  res.status(200).json({ message: 'Curso atualizado com sucesso!' });
+});
+
 // Categorias
 app.get('/listarCategorias', async (req, res) => {
   const categorias = await categoriaController.listarCategorias();
@@ -204,6 +246,16 @@ app.get('/deixarIndisponivelCategoria/:id', async (req, res) => {
   res.status(201).json({ message: 'Categoria marcada como indisponível!' });
 });
 
+app.get('/categoria/:id', async (req, res) => {
+  const categoria = await categoriaController.buscarPorId(req.params.id);
+  res.json(categoria);
+});
+
+app.put('/editarCategoria/:id', async (req, res) => {
+  await categoriaController.editarCategoria(req.body);
+  res.status(200).json({ message: 'Categoria atualizada com sucesso!' });
+});
+
 // Subcategorias
 app.get('/listarSubCategorias', async (req, res) => {
   const subcategorias = await subCategoriaController.listarSubCategorias();
@@ -219,6 +271,16 @@ app.post('/cadastrarSubCategoria', async (req, res) => {
 app.get('/deixarIndisponivelSubCategoria/:id', async (req, res) => {
   await subCategoriaController.deixarIndisponivelSubCategoria(req.params.id);
   res.status(201).json({ message: 'SubCategoria marcada como indisponível!' });
+});
+
+app.get('/subCategoria/:id', async (req, res) => {
+  const subCategoria = await subCategoriaController.buscarPorId(req.params.id);
+  res.json(subCategoria);
+});
+
+app.put('/editarSubCategoria/:id', async (req, res) => {
+  await subCategoriaController.editarSubCategoria(req.body);
+  res.status(200).json({ message: 'SubCategoria atualizada com sucesso!' });
 });
 
 // Login
@@ -241,6 +303,11 @@ app.post('/login', async (req, res) => {
     console.error('Erro ao realizar login:', error);
     res.status(500).json({ message: 'Erro interno no servidor.' });
   }
+});
+
+//Rota pesquisar
+app.get('/pesquisarLivros', (req, res) => {
+  return livroController.pesquisarLivros(req, res);
 });
 
 app.listen(port, () => {

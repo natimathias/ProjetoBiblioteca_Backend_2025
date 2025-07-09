@@ -10,7 +10,6 @@ exports.listarLivros = async function () {
 
 exports.pesquisarLivros = async function (req, res) {
   const termo = req.query.termo;
-    console.log("📥 Termo recebido no controller:", termo);
 
   if (!termo) {
     return res.status(400).json({ message: "Termo de pesquisa não informado." });
@@ -31,6 +30,10 @@ exports.indisponibilizarLivro = async function (id) {
 
 exports.buscarPorId = async function (id) {
   return await livroDAO.buscarPorId(id);
+};
+
+exports.editarLivro = async function (livro) {
+    return await livroDAO.editarLivro(livro);
 };
 
 exports.reduzirQuantidade = async function (id) {

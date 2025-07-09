@@ -20,3 +20,11 @@ exports.deixarIndisponivelCategoria = async function(id) {
     await categoriaDAO.deixarIndisponivelCategoria(id);
 }
 
+exports.buscarPorId = async function (id) {
+    return await categoriaDAO.buscarPorId(id);
+};
+
+exports.editarCategoria = async function (categoria) {
+    return await categoriaDAO.editarCategoria(categoria);
+};
+

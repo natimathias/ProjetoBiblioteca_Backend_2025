@@ -21,3 +21,12 @@ exports.listarAutores = async function () {
     const autores = await db.query('SELECT * FROM autores');
     return autores.rows;
 }
+
+exports.buscarPorId = async function (id) {
+    const resultado = await db.query('SELECT * FROM autores WHERE id = $1 AND disponivel = true', [id]);
+    return resultado.rows[0];
+};
+
+exports.editarAutor = async function (autor) {
+    return await db.query('UPDATE autores SET nome = $1 WHERE id = $2', [autor.nome, autor.id]);
+};

@@ -17,3 +17,12 @@ exports.listarCursos = async function() {
     const cursos = await db.query('SELECT * FROM cursos');
     return cursos.rows;
 }
+
+exports.buscarPorId = async function (id) {
+    const resultado = await db.query('SELECT * FROM curso WHERE id = $1 AND disponivel = true', [id]);
+    return resultado.rows[0];
+};
+
+exports.editarCurso = async function (curso) {
+    return await db.query('UPDATE curso SET nome = $1 WHERE id = $2', [curso.nome, curso.id]);
+};

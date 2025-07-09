@@ -14,3 +14,12 @@ exports.listarEditoras = async function() {
     const editoras = await db.query(`SELECT * FROM editora`); 
     return editoras.rows;
 }
+
+exports.buscarPorId = async function (id) {
+    const resultado = await db.query('SELECT * FROM editora WHERE id = $1 AND disponivel = true', [id]);
+    return resultado.rows[0];
+};
+
+exports.editarEditora = async function (editora) {
+    return await db.query('UPDATE editora SET nome = $1 WHERE id = $2', [editora.nome, editora.id]);
+};

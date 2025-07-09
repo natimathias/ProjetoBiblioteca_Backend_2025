@@ -20,3 +20,11 @@ exports.deixarIndisponivelAutor = async function(id) {
     await autorDAO.deixarIndisponivelAutor(id);
 }
 
+exports.buscarPorId = async function (id) {
+    return await autorDAO.buscarPorId(id);
+};
+
+exports.editarAutor = async function (autor) {
+    return await autorDAO.editarAutor(autor);
+};
+
