@@ -243,6 +243,13 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.get('/meusdados/:id', async (req, res) => {
+  const id = req.params.id;
+  const dados = await locatarioController.buscarDadosCompletos(id); // você vai criar isso no controller
+  res.json(dados);
+});
+
+
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}...`);
 });

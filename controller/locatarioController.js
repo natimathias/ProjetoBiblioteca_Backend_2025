@@ -61,3 +61,8 @@ exports.temPendencias = async (id) => {
 };
 
 exports.verificarLogin = async (email, senha) => await locatarioDAO.verificarLogin(email, senha);
+exports.buscarDadosCompletos = async (id) => {
+  const locatario = await locatarioDAO.buscarDadosCompletos(id); // nova função no DAO
+  return locatario;
+};
+
