@@ -34,6 +34,4 @@ exports.realizarEmprestimo = async function ({ id_locatario, id_livro }) {
   await livroController.reduzirQuantidade(id_livro);
 
   return emprestimoSalvo;
-}
-
-
+};
