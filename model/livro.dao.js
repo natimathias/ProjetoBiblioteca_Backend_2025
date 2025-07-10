@@ -1,9 +1,10 @@
 const db = require('../config/database');
+const { buscarPorId } = require('./autor.dao');
 
 exports.cadastrarLivro = async function (novo_livro) {
   const resposta = await db.query(
     `INSERT INTO livros (titulo, qt_disponivel, isbn, id_autores, id_editora, id_categoria, id_subcategoria, edicao, caminho_imagens, disponivel) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
-    [novo_livro.titulo, novo_livro.qt_disponivel, novo_livro.isbn, novo_livro.id_autores, novo_livro.id_editora, novo_livro.id_categoria, novo_livro.id_subcategoria, novo_livro.edicao, novo_livro.caminho_imagens, true ]
+    [novo_livro.titulo, novo_livro.qt_disponivel, novo_livro.isbn, novo_livro.id_autores, novo_livro.id_editora, novo_livro.id_categoria, novo_livro.id_subcategoria, novo_livro.edicao, novo_livro.caminho_imagens, true]
   );
   return resposta.rows[0].id;
 };
@@ -21,7 +22,7 @@ exports.listarLivros = async function () {
     JOIN categoria ON livros.id_categoria = categoria.id
     WHERE livros.disponivel = true
   `;
-  
+
   const resultado = await db.query(query);
   return resultado.rows;
 };
@@ -52,10 +53,15 @@ exports.indisponibilizarLivro = async function (id) {
 };
 
 exports.buscarPorId = async function (id) {
-    const resultado = await db.query('SELECT * FROM livros WHERE id = $1 AND disponivel = true', [id]);
-    return resultado.rows[0];
+  const resultado = await db.query('SELECT * FROM livros WHERE id = $1 AND disponivel = true', [id]);
+  return resultado.rows[0];
 };
 
 exports.editarLivro = async function (livro) {
-    return await db.query('UPDATE livros SET nome = $1 WHERE id = $2', [livro.nome, livro.id]);
+  return await db.query('UPDATE livros SET nome = $1 WHERE id = $2', [livro.nome, livro.id]);
 };
+
+exports.reduzirQuantidade = async function (id_livro) {
+  const resultado = await buscarPorId(id_livro);
+  return await db.query(`UPDATE livros SET qt_disponivel = ${ resultado - 1}`)
+}

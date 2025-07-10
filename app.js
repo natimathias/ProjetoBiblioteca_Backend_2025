@@ -186,9 +186,9 @@ app.put('/editarLivro/:id', async (req, res) => {
 });
 
 // Empréstimos
-app.post('/emprestarLivro', async (req, res) => {
-  const { id_locatario, id_livro } = req.body;
-
+app.get('/emprestarLivro', async (req, res) => {
+  const { id_locatario, id_livro } = req.query;
+  console.log(id_livro, id_locatario)
   if (!id_locatario || !id_livro) {
     return res.status(400).json({ erro: "Dados incompletos para empréstimo." });
   }
