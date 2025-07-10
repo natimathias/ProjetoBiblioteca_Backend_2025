@@ -187,19 +187,8 @@ app.put('/editarLivro/:id', async (req, res) => {
 
 // Empréstimos
 app.post('/emprestarLivro', async (req, res) => {
-  const { id_locatario, id_livro } = req.body;
-
-  if (!id_locatario || !id_livro) {
-    return res.status(400).json({ erro: "Dados incompletos para empréstimo." });
-  }
-
-  const resultado = await emprestimoController.realizarEmprestimo({ id_locatario, id_livro });
-
-  if (resultado.erro) {
-    return res.status(400).json({ erro: resultado.erro });
-  }
-
-  return res.status(201).json({ mensagem: resultado.mensagem });
+  const emprestimos = await emprestimoController.emprestarLivro();
+  res.json(emprestimos);
 });
 
 // Cursos

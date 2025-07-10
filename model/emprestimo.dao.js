@@ -1,51 +1,41 @@
 const db = require('../config/database');
 
-exports.listarEmprestimosAtivosPorLocatario = async function (id_locatario) {
-  const query = `
-    SELECT * FROM emprestimos 
-    WHERE id_locatario = $1 AND status = 'ativo'
-  `;
-  const result = await db.query(query, [id_locatario]);
-  return result.rows;
-};
-
-exports.criarEmprestimo = async function (emprestimo) {
-  const query = `
-    INSERT INTO emprestimos (id_locatario, id_livro, data_emprestimo, data_devolucao, status)
-    VALUES ($1, $2, $3, $4, $5) RETURNING *
-  `;
-
-  const values = [
-    emprestimo.id_locatario,
-    emprestimo.id_livro,
-    emprestimo.data_emprestimo,
-    emprestimo.data_devolucao,
-    emprestimo.status,
-  ];
-
-  const result = await db.query(query, values);
+exports.getUsuarioPorId = async (id) => {
+  const result = await db.query('SELECT * FROM usuario WHERE id = $1', [id]);
   return result.rows[0];
 };
 
-exports.atualizarStatusEmprestimo = async function (id_emprestimo, novoStatus) {
-  const query = `
-    UPDATE emprestimos SET status = $1 WHERE id = $2
-  `;
-  await db.query(query, [novoStatus, id_emprestimo]);
+exports.contarEmprestimosAtivos = async (id_usuario) => {
+  const result = await db.query(`
+    SELECT COUNT(*) FROM emprestimo 
+    WHERE id_usuario = $1 AND data_devolucao_real IS NULL
+  `, [id_usuario]);
+  return parseInt(result.rows[0].count);
 };
 
-exports.listarEmprestimosPorLocatario = async function (id_locatario) {
-  const query = `
-    SELECT * FROM emprestimos WHERE id_locatario = $1
-  `;
-  const result = await db.query(query, [id_locatario]);
-  return result.rows;
+exports.verificarAtrasos = async (id_usuario) => {
+  const result = await db.query(`
+    SELECT 1 FROM emprestimo 
+    WHERE id_usuario = $1 
+    AND data_devolucao_real IS NULL 
+    AND data_devolucao_prevista < CURRENT_DATE
+    LIMIT 1
+  `, [id_usuario]);
+  return result.rowCount > 0;
 };
 
-exports.buscarPorId = async function (id_emprestimo) {
-  const query = `
-    SELECT * FROM emprestimos WHERE id = $1
-  `;
-  const result = await db.query(query, [id_emprestimo]);
+exports.getLivroPorId = async (id_livro) => {
+  const result = await db.query('SELECT * FROM livro WHERE id = $1', [id_livro]);
   return result.rows[0];
+};
+
+exports.criarEmprestimo = async (id_usuario, id_livro, dataEmprestimo, dataDevolucaoPrevista) => {
+  await db.query(`
+    INSERT INTO emprestimo (id_usuario, id_livro, data_emprestimo, data_devolucao_prevista)
+    VALUES ($1, $2, $3, $4)
+  `, [id_usuario, id_livro, dataEmprestimo, dataDevolucaoPrevista]);
+};
+
+exports.diminuirEstoque = async (id_livro) => {
+  await db.query('UPDATE livro SET qt_disponivel = qt_disponivel - 1 WHERE id = $1', [id_livro]);
 };

@@ -1,37 +1,43 @@
-const Emprestimo = require('../entidades/emprestimos');
-const livroController = require('./livroController');
-const locatarioController = require('./locatarioController');
-const emprestimoDAO = require('../model/emprestimo.dao');
+const emprestimoDAO = require('../dao/emprestimoDAO');
 
-exports.realizarEmprestimo = async function ({ id_locatario, id_livro }) {
-  const locatario = await locatarioController.buscarPorId(id_locatario);
-  const livro = await livroController.buscarPorId(id_livro);
+exports.emprestarLivro = async (req, res) => {
+  try {
+    const { id_usuario, id_livro } = req.body;
 
-  if (!locatario || !livro) return { erro: 'Locatário ou livro não encontrado.' };
-  if (livro.qt_disponivel <= 0) return { erro: 'Livro indisponível.' };
-  if (await locatarioController.temPendencias(id_locatario)) return { erro: 'Locatário possui pendências.' };
+    const usuario = await emprestimoDAO.getUsuarioPorId(id_usuario);
+    if (!usuario) return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
 
-  const emprestimosAtivos = await emprestimoDAO.listarEmprestimosAtivosPorLocatario(id_locatario);
-  const limite = locatario.tipo === 'aluno' ? 3 : 5;
-  const prazoDias = locatario.tipo === 'aluno' ? 14 : 30;
+    const perfil = usuario.perfil;
+    const limite = perfil === 'aluno' ? 3 : 5;
 
-  if (emprestimosAtivos.length >= limite) return { erro: 'Limite de empréstimos atingido.' };
+    const qtdEmprestimos = await emprestimoDAO.contarEmprestimosAtivos(id_usuario);
+    if (qtdEmprestimos >= limite) {
+      return res.status(400).json({ mensagem: `Limite de ${limite} empréstimos para perfil ${perfil}.` });
+    }
 
-  const data_emprestimo = new Date();
-  const data_devolucao = new Date(data_emprestimo);
-  data_devolucao.setDate(data_devolucao.getDate() + prazoDias);
+    const possuiAtrasos = await emprestimoDAO.verificarAtrasos(id_usuario);
+    if (possuiAtrasos) {
+      return res.status(400).json({ mensagem: 'Usuário com empréstimos em atraso.' });
+    }
 
-  const novoEmprestimo = new Emprestimo(
-    id_locatario,
-    id_livro,
-    data_emprestimo,
-    data_devolucao,
-    'ativo'
-  );
+    const livro = await emprestimoDAO.getLivroPorId(id_livro);
+    if (!livro || livro.qt_disponivel < 1) {
+      return res.status(400).json({ mensagem: 'Livro indisponível.' });
+    }
 
-  const emprestimoSalvo = await emprestimoDAO.criarEmprestimo(novoEmprestimo);
+    // Datas
+    const hoje = new Date();
+    const devolucaoPrevista = new Date(hoje);
+    devolucaoPrevista.setDate(hoje.getDate() + (perfil === 'aluno' ? 14 : 30));
 
-  await livroController.reduzirQuantidade(id_livro);
+    // Cadastrar empréstimo e atualizar estoque
+    await emprestimoDAO.criarEmprestimo(id_usuario, id_livro, hoje, devolucaoPrevista);
+    await emprestimoDAO.diminuirEstoque(id_livro);
 
-  return emprestimoSalvo;
+    res.status(200).json({ mensagem: 'Empréstimo realizado com sucesso.' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensagem: 'Erro ao processar empréstimo.' });
+  }
 };
