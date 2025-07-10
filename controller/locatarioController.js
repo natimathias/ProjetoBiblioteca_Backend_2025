@@ -35,10 +35,28 @@ exports.verificarLogin = async (email, senha) => {
 };
 
 exports.buscarPorId = async function (id) {
-    return await locatarioDAO.buscarPorId(id);
+  return await locatarioDAO.buscarPorId(id);
 };
 
 exports.editarLocatario = async function (locatario) {
-    return await locatarioDAO.editarLocatario(locatario);
+  return await locatarioDAO.editarLocatario(locatario);
 };
 
+exports.buscarMeusDados = async function (req, res) {
+  const id = req.params.id;
+
+  try {
+    const pessoal = await locatarioDAO.buscarPorId(id);
+    const livrosEmprestados = await locatarioDAO.listarEmprestimosAtivosPorLocatario(id);
+    const historicoDevolucoes = await locatarioDAO.listarHistoricoDevolucoesPorLocatario(id);
+
+    res.status(200).json({
+      pessoal,
+      livrosEmprestados,
+      historicoDevolucoes
+    });
+  } catch (error) {
+    console.error("Erro ao buscar dados do locatário:", error);
+    res.status(500).json({ message: "Erro interno ao buscar dados." });
+  }
+};

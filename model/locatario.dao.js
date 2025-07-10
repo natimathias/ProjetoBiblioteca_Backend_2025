@@ -34,3 +34,23 @@ exports.buscarPorId = async function (id) {
 exports.editarLocatario = async function (locatario) {
     return await db.query('UPDATE locatario SET nome = $1 WHERE id = $2', [locatario.nome, locatario.id]);
 };
+
+exports.listarEmprestimosAtivosPorLocatario = async function (id) {
+    const resultado = await db.query(`
+        SELECT l.titulo, l.autor, e.data_emprestimo
+        FROM emprestimo e
+        JOIN livro l ON l.id = e.id_livro
+        WHERE e.id_locatario = $1 AND e.status = 'ativo'
+    `, [id]);
+    return resultado.rows;
+};
+
+exports.listarHistoricoDevolucoesPorLocatario = async function (id) {
+    const resultado = await db.query(`
+        SELECT l.titulo, l.autor, e.data_devolucao
+        FROM emprestimo e
+        JOIN livro l ON l.id = e.id_livro
+        WHERE e.id_locatario = $1 AND e.status = 'finalizado'
+    `, [id]);
+    return resultado.rows;
+};
